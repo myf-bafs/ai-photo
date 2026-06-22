@@ -369,6 +369,7 @@
 
         // QR Code Object global store
         let qrCodeInstance = null;
+        let qrGenerating = false;
 
         // Main elements
         const videoJoint = document.getElementById('video-joint');
@@ -919,8 +920,11 @@
                     drawSingleCharacter('char2');
                 }
 
-                // Regenerate QR Code dynamically every time the canvas finishes drawing!
-                generateDownloadQRCode();
+                // Regenerate QR Code in background (non-blocking)
+                if (!qrGenerating) {
+                    qrGenerating = true;
+                    generateDownloadQRCode().catch(() => {}).finally(() => { qrGenerating = false; });
+                }
             };
             bgImg.src = bgImgBase64;
         }
@@ -996,9 +1000,9 @@
             const qrContainer = document.getElementById('qrcode');
             if (!qrContainer) return;
             
-            // Show loading placeholder first
-            qrContainer.innerHTML = "<div class='text-[10px] text-slate-400 animate-pulse text-center py-6'>正在上傳生成分享二維碼...</div>";
+            // Show QR area with minimal loading
             qrcodeArea.classList.remove('hidden');
+            qrContainer.innerHTML = "<div class='text-[10px] text-slate-400 animate-pulse text-center py-6'>生成 QR Code 中...</div>";
 
             try {
                 // Get current canvas state image data
@@ -1044,7 +1048,7 @@
                 }
             } catch (err) {
                 console.error("QR Code generation failed:", err);
-                qrContainer.innerHTML = "<div class='text-[10px] text-red-500 text-center py-6'>二維碼生成失敗<br>請改按右上角「儲存高畫質圖」儲存</div>";
+                qrContainer.innerHTML = "<div class='text-[10px] text-red-500 text-center py-6'>二維碼生成失敗<br>請按右上角「儲存高畫質圖」</div>";
             }
         }
 
