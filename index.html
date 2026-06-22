@@ -299,6 +299,23 @@
 
     <!-- Application Engine Logic -->
     <script>
+        function compressImage(dataUrl, maxW = 1024, quality = 0.7) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.onload = function () {
+                    let { width, height } = img;
+                    if (width > height && width > maxW) { height *= maxW / width; width = maxW; }
+                    else if (height > maxW) { width *= maxW / height; height = maxW; }
+                    const c = document.createElement('canvas');
+                    c.width = width; c.height = height;
+                    const ctx = c.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    resolve(c.toDataURL('image/jpeg', quality));
+                };
+                img.src = dataUrl;
+            });
+        }
+
         // State
         const apiKey = ""; // Set via Vercel env GEMINI_API_KEY (proxy at /api/gemini)
         let isCameraActive = false;
@@ -819,8 +836,8 @@
             const file = event.target.files[0];
             if (file) {
                 const reader = new FileReader();
-                reader.onload = function(e) {
-                    bgImgBase64 = e.target.result;
+                reader.onload = async function(e) {
+                    bgImgBase64 = await compressImage(e.target.result);
                     document.getElementById('bg-file-name').textContent = file.name;
                     const thumb = document.getElementById('bg-thumbnail');
                     thumb.src = bgImgBase64;
@@ -839,13 +856,14 @@
             const file = event.target.files[0];
             if (file) {
                 const reader = new FileReader();
-                reader.onload = function(e) {
+                reader.onload = async function(e) {
+                    const compressed = await compressImage(e.target.result);
                     if (type === 'male') {
-                        maleUniformTemplateBase64 = e.target.result;
+                        maleUniformTemplateBase64 = compressed;
                         document.getElementById('male-ref-name').textContent = `👦 ${file.name}`;
                         showToast("男生校服參考圖 (1.png) 載入成功！");
                     } else {
-                        femaleUniformTemplateBase64 = e.target.result;
+                        femaleUniformTemplateBase64 = compressed;
                         document.getElementById('female-ref-name').textContent = `👧 ${file.name}`;
                         showToast("女生校裙參考圖 (2.png) 載入成功！");
                     }
@@ -859,16 +877,17 @@
             const file = event.target.files[0];
             if (file) {
                 const reader = new FileReader();
-                reader.onload = function(e) {
+                reader.onload = async function(e) {
+                    const compressed = await compressImage(e.target.result);
                     if (charId === 'joint') {
-                        jointFaceBase64 = e.target.result;
+                        jointFaceBase64 = compressed;
                         facePreviewJoint.src = jointFaceBase64;
                         facePreviewJoint.classList.remove('hidden');
                         placeholderJoint.classList.add('hidden');
                         document.getElementById('label-joint-file').textContent = file.name;
                         showToast("上傳智能相片成功！");
                     } else {
-                        charState[charId].faceBase64 = e.target.result;
+                        charState[charId].faceBase64 = compressed;
                         document.getElementById(`label-${charId === 'char1' ? 'face1' : 'face2'}`).textContent = file.name;
                         showToast(`人臉照片已成功載入到 ${charId === 'char1' ? '人物 1' : '人物 2'}！`);
                     }
