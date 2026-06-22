@@ -1080,6 +1080,30 @@
             throw new Error("AI 融合服務暫時無回應，請確認 API 連線後重試！");
         }
 
+        async function detectGenderFromImage(imageBase64) {
+            const payload = {
+                contents: [{
+                    parts: [
+                        { text: "Analyze this photo. Count how many people are in it. For each person, describe their gender (male/female) based on their appearance. Return ONLY a JSON array like: [{\"person\":1,\"gender\":\"male\"},{\"person\":2,\"gender\":\"female\"}]" },
+                        { inlineData: { mimeType: "image/png", data: imageBase64 } }
+                    ]
+                }]
+            };
+            const res = await fetch("/api/gemini?model=gemini-2.5-flash", {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "[]";
+            try {
+                const jsonMatch = text.match(/\[.*?\]/s);
+                return jsonMatch ? JSON.parse(jsonMatch[0]) : [{ person: 1, gender: "unknown" }];
+            } catch {
+                return [{ person: 1, gender: "unknown" }];
+            }
+        }
+
         // Simultaneous Character Generation (Supports Joint合照 (1-4人) and Separate mode!)
         async function generateBothCharacters() {
             if (!bgImgBase64) {
@@ -1117,15 +1141,20 @@
                     const rawMaleUniform = maleUniformTemplateBase64.split(',')[1];
                     const rawFemaleUniform = femaleUniformTemplateBase64.split(',')[1];
 
-                    // Advanced prompt instructing AI to recognize 1, 2, 3, or 4 people, swap bodies, AND generate FULL BODY (生成埋腳)
+                    // Step 1: Detect genders using Gemini 2.5 Flash (text model)
+                    updateStatus("正在分析相片人數與性別...", "AI 正在用文字模型分析每位人物嘅性別...");
+                    const genderInfo = await detectGenderFromImage(rawFaceBase64);
+                    const genderDesc = genderInfo.map(g => `Person ${g.person}: ${g.gender}`).join(". ");
+                    console.log("Detected genders:", genderDesc);
+
+                    // Step 2: Generate image with explicit gender info
                     const promptText = `
                     Role: Professional high-fidelity campus art illustrator.
-                    Action: Examine each individual in the provided photo one by one. Count how many people there are. For each person, look at their face and appearance to determine their gender independently. Do NOT default to one male and one female — determine each person's actual gender from their facial features and appearance.
+                    Gender analysis result: ${genderDesc}
                     - CRITICAL: The face and head of EACH person must stay EXACTLY as in the original photo. Only change the body below the neck. Do not alter facial features, hair, or head shape.
-                    - For each person: detect their gender from the photo (look at hair style, facial features, and overall appearance).
+                    - Based on the above gender analysis, dress each person in the correct uniform.
                     - If a person is MALE, dress them in the male school uniform shown in the second image (1.png).
                     - If a person is FEMALE, dress them in the female sailor school blouse and skirt shown in the third image (2.png).
-                    - IMPORTANT: If there are two males, both must wear the male uniform. If there are two females, both must wear the female uniform. Do not create one of each by default.
                     - CRITICAL: The clothing MUST look exactly like the reference images (1.png and 2.png). Copy the fabric colors, collar shape, pockets, skirt pleats, and all details precisely.
                     - CRITICAL COLOR LOCK: The female school skirt and the sailor collar of the blouse MUST be the exact same light water-blue color shown in the third image (2.png). DO NOT make the skirt or collar navy blue, black, or red. The sailor tie must also be this exact light water-blue color.
                     Gesture/Action (Say Hi!): Each detected person must raise one hand cheerfully to wave, saying hello/saying hi, with a warm friendly smile! Keep them energetic, close-knit, and lively.
@@ -1185,21 +1214,25 @@
 
                     // Character 1 Generation Pipeline (Full Body)
                     const p1 = (async () => {
-                        updateStatus("雙軌 AI 全身融合啟動中...", "分析人物 1 性別並套用對應全身校服...");
+                        updateStatus("雙軌 AI 全身融合啟動中...", "分析人物 1 性別...");
                         
                         const rawFaceBase64 = charState.char1.faceBase64.split(',')[1];
                         const rawMaleUniform = maleUniformTemplateBase64.split(',')[1];
                         const rawFemaleUniform = femaleUniformTemplateBase64.split(',')[1];
 
+                        // Detect gender for person 1
+                        const genderInfo = await detectGenderFromImage(rawFaceBase64);
+                        const personGender = genderInfo[0]?.gender || "unknown";
+                        updateStatus("雙軌 AI 全身融合啟動中...", `人物 1 偵測為 ${personGender === "male" ? "男生" : "女生"}，正在生成全身校服...`);
+
                         const promptText = `
                         Role: Professional high-fidelity campus art illustrator.
-                        Action: Look at the face in the first photo and determine the person's actual gender. Do not assume — look at the person's appearance carefully. 
+                        The person in the photo is ${personGender}.
                         - CRITICAL: Keep the face and head EXACTLY as in the first image. Do not alter facial features, hair style, or head shape.
-                        - If the person is MALE, dress them in the male school uniform shown in the second image (1.png).
-                        - If the person is FEMALE, dress them in the female sailor school blouse and skirt shown in the third image (2.png).
+                        - Since this person is ${personGender}, dress them in the ${personGender === "male" ? "male school uniform shown in the second image (1.png)" : "female sailor school blouse and skirt shown in the third image (2.png)"}.
                         - CRITICAL: The clothing MUST look exactly like the reference images. Copy the colors, collar, pockets, and all details precisely.
                         - CRITICAL COLOR LOCK: The female school skirt and the sailor collar MUST be the exact same light water-blue color shown in the third image (2.png). DO NOT make the skirt or collar navy blue, black, or red.
-                        Gesture/Action (Say Hi!): The person must raise one hand cheerfully to wave and wave hand, saying hello/saying hi, with a warm friendly smile! Keep them energetic and lively.
+                        Gesture/Action (Say Hi!): The person must raise one hand cheerfully to wave, saying hello/saying hi, with a warm friendly smile! Keep them energetic and lively.
                         Grounding (生成埋腳): 
                         - This MUST be a FULL-BODY portrait, showing the person from head to toe. 
                         - Ensure their entire legs, white crew socks, and black leather school shoes are completely visible.
@@ -1240,21 +1273,25 @@
 
                     // Character 2 Generation Pipeline (Full Body)
                     const p2 = (async () => {
-                        updateStatus("雙軌 AI 全身融合啟動中...", "分析人物 2 性別並套用對應全身校服...");
+                        updateStatus("雙軌 AI 全身融合啟動中...", "分析人物 2 性別...");
                         
                         const rawFaceBase64 = charState.char2.faceBase64.split(',')[1];
                         const rawMaleUniform = maleUniformTemplateBase64.split(',')[1];
                         const rawFemaleUniform = femaleUniformTemplateBase64.split(',')[1];
 
+                        // Detect gender for person 2
+                        const genderInfo = await detectGenderFromImage(rawFaceBase64);
+                        const personGender = genderInfo[0]?.gender || "unknown";
+                        updateStatus("雙軌 AI 全身融合啟動中...", `人物 2 偵測為 ${personGender === "male" ? "男生" : "女生"}，正在生成全身校服...`);
+
                         const promptText = `
                         Role: Professional high-fidelity campus art illustrator.
-                        Action: Look at the face in the first photo and determine the person's actual gender. Do not assume — look at the person's appearance carefully. 
+                        The person in the photo is ${personGender}.
                         - CRITICAL: Keep the face and head EXACTLY as in the first image. Do not alter facial features, hair style, or head shape.
-                        - If the person is MALE, dress them in the male school uniform shown in the second image (1.png).
-                        - If the person is FEMALE, dress them in the female sailor school blouse and skirt shown in the third image (2.png).
+                        - Since this person is ${personGender}, dress them in the ${personGender === "male" ? "male school uniform shown in the second image (1.png)" : "female sailor school blouse and skirt shown in the third image (2.png)"}.
                         - CRITICAL: The clothing MUST look exactly like the reference images. Copy the colors, collar, pockets, and all details precisely.
                         - CRITICAL COLOR LOCK: The female school skirt and the sailor collar MUST be the exact same light water-blue color shown in the third image (2.png). DO NOT make the skirt or collar navy blue, black, or red.
-                        Gesture/Action (Say Hi!): The person must raise one hand cheerfully to wave and wave hand, saying hello/saying hi, with a warm friendly smile! Keep them energetic and lively.
+                        Gesture/Action (Say Hi!): The person must raise one hand cheerfully to wave, saying hello/saying hi, with a warm friendly smile! Keep them energetic and lively.
                         Grounding (生成埋腳): 
                         - This MUST be a FULL-BODY portrait, showing the person from head to toe. 
                         - Ensure their entire legs, white crew socks, and black leather school shoes are completely visible.
