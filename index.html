@@ -1120,11 +1120,12 @@
                     // Advanced prompt instructing AI to recognize 1, 2, 3, or 4 people, swap bodies, AND generate FULL BODY (生成埋腳)
                     const promptText = `
                     Role: Professional high-fidelity campus art illustrator.
-                    Action: Analyze the single provided photo which contains 1, 2, 3, or 4 individuals standing.
+                    Action: Examine each individual in the provided photo one by one. Count how many people there are. For each person, look at their face and appearance to determine their gender independently. Do NOT default to one male and one female — determine each person's actual gender from their facial features and appearance.
                     - CRITICAL: The face and head of EACH person must stay EXACTLY as in the original photo. Only change the body below the neck. Do not alter facial features, hair, or head shape.
-                    - For each detected person in this photo, automatically detect their gender.
+                    - For each person: detect their gender from the photo (look at hair style, facial features, and overall appearance).
                     - If a person is MALE, dress them in the male school uniform shown in the second image (1.png).
                     - If a person is FEMALE, dress them in the female sailor school blouse and skirt shown in the third image (2.png).
+                    - IMPORTANT: If there are two males, both must wear the male uniform. If there are two females, both must wear the female uniform. Do not create one of each by default.
                     - CRITICAL: The clothing MUST look exactly like the reference images (1.png and 2.png). Copy the fabric colors, collar shape, pockets, skirt pleats, and all details precisely.
                     - CRITICAL COLOR LOCK: The female school skirt and the sailor collar of the blouse MUST be the exact same light water-blue color shown in the third image (2.png). DO NOT make the skirt or collar navy blue, black, or red. The sailor tie must also be this exact light water-blue color.
                     Gesture/Action (Say Hi!): Each detected person must raise one hand cheerfully to wave, saying hello/saying hi, with a warm friendly smile! Keep them energetic, close-knit, and lively.
@@ -1192,10 +1193,10 @@
 
                         const promptText = `
                         Role: Professional high-fidelity campus art illustrator.
-                        Action: Detect the gender of the face in the first image. 
+                        Action: Look at the face in the first photo and determine the person's actual gender. Do not assume — look at the person's appearance carefully. 
                         - CRITICAL: Keep the face and head EXACTLY as in the first image. Do not alter facial features, hair style, or head shape.
-                        - If the face is MALE, dress the person in the male school uniform shown in the second image (1.png).
-                        - If the face is FEMALE, dress the person in the female sailor school blouse and skirt shown in the third image (2.png).
+                        - If the person is MALE, dress them in the male school uniform shown in the second image (1.png).
+                        - If the person is FEMALE, dress them in the female sailor school blouse and skirt shown in the third image (2.png).
                         - CRITICAL: The clothing MUST look exactly like the reference images. Copy the colors, collar, pockets, and all details precisely.
                         - CRITICAL COLOR LOCK: The female school skirt and the sailor collar MUST be the exact same light water-blue color shown in the third image (2.png). DO NOT make the skirt or collar navy blue, black, or red.
                         Gesture/Action (Say Hi!): The person must raise one hand cheerfully to wave and wave hand, saying hello/saying hi, with a warm friendly smile! Keep them energetic and lively.
@@ -1247,10 +1248,10 @@
 
                         const promptText = `
                         Role: Professional high-fidelity campus art illustrator.
-                        Action: Detect the gender of the face in the first image. 
+                        Action: Look at the face in the first photo and determine the person's actual gender. Do not assume — look at the person's appearance carefully. 
                         - CRITICAL: Keep the face and head EXACTLY as in the first image. Do not alter facial features, hair style, or head shape.
-                        - If the face is MALE, dress the person in the male school uniform shown in the second image (1.png).
-                        - If the face is FEMALE, dress the person in the female sailor school blouse and skirt shown in the third image (2.png).
+                        - If the person is MALE, dress them in the male school uniform shown in the second image (1.png).
+                        - If the person is FEMALE, dress them in the female sailor school blouse and skirt shown in the third image (2.png).
                         - CRITICAL: The clothing MUST look exactly like the reference images. Copy the colors, collar, pockets, and all details precisely.
                         - CRITICAL COLOR LOCK: The female school skirt and the sailor collar MUST be the exact same light water-blue color shown in the third image (2.png). DO NOT make the skirt or collar navy blue, black, or red.
                         Gesture/Action (Say Hi!): The person must raise one hand cheerfully to wave and wave hand, saying hello/saying hi, with a warm friendly smile! Keep them energetic and lively.
