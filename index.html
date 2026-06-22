@@ -1121,17 +1121,18 @@
                     const promptText = `
                     Role: Professional high-fidelity campus art illustrator.
                     Action: Analyze the single provided photo which contains 1, 2, 3, or 4 individuals standing.
-                    - For each detected person in this photo, automatically detect their gender and facial features.
-                    - If a person is MALE, swap their body with the male school uniform shown in the second image (1.png), consisting of a white short-sleeved pocket shirt with badge and dark grey trousers.
-                    - If a person is FEMALE, swap their body with the female sailor school blouse and skirt shown in the third image (2.png).
-                    - CRITICAL COLOR LOCK: The female school skirt and the sailor collar of the blouse MUST be the exact same light water-blue (pale sky blue / light cyan / light aqua blue) color as shown in the third image (2.png). DO NOT make the skirt or collar navy blue, black, or red. The sailor tie must also be this exact light water-blue color.
-                    - Strictly preserve and replicate the exact colors, shades, and patterns of the clothing from the reference images (1.png and 2.png) with zero color modification.
-                    Gesture/Action (Say Hi!): Each detected person must raise one hand cheerfully to wave and wave hand, saying hello/saying hi, with a warm friendly smile! Keep them energetic, close-knit, and lively.
+                    - CRITICAL: The face and head of EACH person must stay EXACTLY as in the original photo. Only change the body below the neck. Do not alter facial features, hair, or head shape.
+                    - For each detected person in this photo, automatically detect their gender.
+                    - If a person is MALE, dress them in the male school uniform shown in the second image (1.png).
+                    - If a person is FEMALE, dress them in the female sailor school blouse and skirt shown in the third image (2.png).
+                    - CRITICAL: The clothing MUST look exactly like the reference images (1.png and 2.png). Copy the fabric colors, collar shape, pockets, skirt pleats, and all details precisely.
+                    - CRITICAL COLOR LOCK: The female school skirt and the sailor collar of the blouse MUST be the exact same light water-blue color shown in the third image (2.png). DO NOT make the skirt or collar navy blue, black, or red. The sailor tie must also be this exact light water-blue color.
+                    Gesture/Action (Say Hi!): Each detected person must raise one hand cheerfully to wave, saying hello/saying hi, with a warm friendly smile! Keep them energetic, close-knit, and lively.
                     Grounding (生成埋腳): 
                     - This MUST be a FULL-BODY portrait of all individuals standing next to each other, showing them from head to toe. 
-                    - Ensure their entire legs, socks (white crew socks), and school shoes (black leather school shoes for boys, black T-strap leather school shoes with buckles for girls) are completely visible and realistically drawn. Do not crop the legs or feet.
+                    - Ensure their entire legs, white crew socks, and black leather school shoes are completely visible and realistically drawn. Do not crop the legs or feet.
                     - Keep their relative standing positions (left-to-right alignment) exactly as in the original photo.
-                    Style: Exquisite hand-drawn watercolor sketch, detailed pencil & ink line art, soft textures, vibrant youth anime/art-book campus illustration style.
+                    Style: Clean realistic digital illustration, vivid colors, sharp details.
                     Constraint:
                     - Place the final generated full-body portrait of the person/group on a solid #FFFFFF (pure white) background with absolutely nothing else.
                     `;
@@ -1192,17 +1193,17 @@
                         const promptText = `
                         Role: Professional high-fidelity campus art illustrator.
                         Action: Detect the gender of the face in the first image. 
-                        - If the face is MALE, dress him in the male school uniform shown in the second image (1.png), which is white shirt and dark grey trousers.
-                        - If the face is FEMALE, dress her in the female sailor school blouse and skirt shown in the third image (2.png).
-                        - CRITICAL COLOR LOCK: The female school skirt and the sailor collar of the blouse MUST be the exact same light water-blue (pale sky blue / light cyan / light aqua blue) color as shown in the third image (2.png). DO NOT make the skirt or collar navy blue, black, or red. The sailor tie must also be this exact light water-blue color.
-                        - Strictly preserve and replicate the exact colors, shades, and patterns of the clothing from the reference images (1.png and 2.png) with zero color modification.
+                        - CRITICAL: Keep the face and head EXACTLY as in the first image. Do not alter facial features, hair style, or head shape.
+                        - If the face is MALE, dress the person in the male school uniform shown in the second image (1.png).
+                        - If the face is FEMALE, dress the person in the female sailor school blouse and skirt shown in the third image (2.png).
+                        - CRITICAL: The clothing MUST look exactly like the reference images. Copy the colors, collar, pockets, and all details precisely.
+                        - CRITICAL COLOR LOCK: The female school skirt and the sailor collar MUST be the exact same light water-blue color shown in the third image (2.png). DO NOT make the skirt or collar navy blue, black, or red.
                         Gesture/Action (Say Hi!): The person must raise one hand cheerfully to wave and wave hand, saying hello/saying hi, with a warm friendly smile! Keep them energetic and lively.
                         Grounding (生成埋腳): 
                         - This MUST be a FULL-BODY portrait, showing the person from head to toe. 
                         - Ensure their entire legs, white crew socks, and black leather school shoes are completely visible.
                         Constraint:
-                        - Keep the face highly recognizable but render it in a clean hand-drawn/painted texture.
-                        - CRITICAL: Place the final generated full-body portrait on a solid #FFFFFF (pure white) background with absolutely nothing else.
+                        - Place the final generated full-body portrait on a solid #FFFFFF (pure white) background with absolutely nothing else.
                         `;
 
                         const payload = {
@@ -1246,17 +1247,17 @@
                         const promptText = `
                         Role: Professional high-fidelity campus art illustrator.
                         Action: Detect the gender of the face in the first image. 
-                        - If the face is MALE, dress him in the male school uniform shown in the second image (1.png), which is white shirt and dark grey trousers.
-                        - If the face is FEMALE, dress her in the female sailor school blouse and skirt shown in the third image (2.png).
-                        - CRITICAL COLOR LOCK: The female school skirt and the sailor collar of the blouse MUST be the exact same light water-blue (pale sky blue / light cyan / light aqua blue) color as shown in the third image (2.png). DO NOT make the skirt or collar navy blue, black, or red. The sailor tie must also be this exact light water-blue color.
-                        - Strictly preserve and replicate the exact colors, shades, and patterns of the clothing from the reference images (1.png and 2.png) with zero color modification.
+                        - CRITICAL: Keep the face and head EXACTLY as in the first image. Do not alter facial features, hair style, or head shape.
+                        - If the face is MALE, dress the person in the male school uniform shown in the second image (1.png).
+                        - If the face is FEMALE, dress the person in the female sailor school blouse and skirt shown in the third image (2.png).
+                        - CRITICAL: The clothing MUST look exactly like the reference images. Copy the colors, collar, pockets, and all details precisely.
+                        - CRITICAL COLOR LOCK: The female school skirt and the sailor collar MUST be the exact same light water-blue color shown in the third image (2.png). DO NOT make the skirt or collar navy blue, black, or red.
                         Gesture/Action (Say Hi!): The person must raise one hand cheerfully to wave and wave hand, saying hello/saying hi, with a warm friendly smile! Keep them energetic and lively.
                         Grounding (生成埋腳): 
                         - This MUST be a FULL-BODY portrait, showing the person from head to toe. 
-                        - Ensure their entire legs, white crew socks, and black T-strap school shoes are completely visible.
+                        - Ensure their entire legs, white crew socks, and black leather school shoes are completely visible.
                         Constraint:
-                        - Keep the face highly recognizable but render it in a clean hand-drawn/painted texture.
-                        - CRITICAL: Place the final generated full-body portrait on a solid #FFFFFF (pure white) background with absolutely nothing else.
+                        - Place the final generated full-body portrait on a solid #FFFFFF (pure white) background with absolutely nothing else.
                         `;
 
                         const payload = {
