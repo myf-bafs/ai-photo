@@ -300,7 +300,7 @@
     <!-- Application Engine Logic -->
     <script>
         // State
-        const apiKey = "AIzaSyBqhMH7RxJV-zsAhK7edLllwgYJ39gXhPw"; // Google Gemini API Key
+        const apiKey = "AQ.Ab8RN6ITuwVqZo1Q5ouNGCEZA2d9cr5CY1DPO30E4l0x6SeApg"; // Google Gemini API Key
         let isCameraActive = false;
         let cameraStream = null;
         let currentMode = 'joint'; // Default: Joint mode (Supports 1-4 people)
@@ -1126,7 +1126,7 @@
                                 { inlineData: { mimeType: "image/png", data: rawFemaleUniform } }
                             ]
                         }],
-                        generationConfig: { responseModalalities: ["IMAGE"] }
+                        generationConfig: { responseModalities: ["IMAGE"] }
                     };
 
                     updateStatus("正在套用全身校服並轉化手繪風...", "為相中所有學生穿上服裝，並強制重構 Say Hi 👋 全身手勢姿勢...");
@@ -1195,7 +1195,7 @@
                                     { inlineData: { mimeType: "image/png", data: rawFemaleUniform } }
                                 ]
                             }],
-                            generationConfig: { responseModalalities: ["IMAGE"] }
+                            generationConfig: { responseModalities: ["IMAGE"] }
                         };
 
                         const responseData = await makeGeminiApiCall(payload);
@@ -1249,7 +1249,7 @@
                                     { inlineData: { mimeType: "image/png", data: rawFemaleUniform } }
                                 ]
                             }],
-                            generationConfig: { responseModalalities: ["IMAGE"] }
+                            generationConfig: { responseModalities: ["IMAGE"] }
                         };
 
                         const responseData = await makeGeminiApiCall(payload);
