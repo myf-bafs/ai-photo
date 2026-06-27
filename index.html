@@ -561,7 +561,7 @@
             checkEnvironmentSafety();
 
             // Auto-load default images
-            loadDefaultImages();
+            setTimeout(loadDefaultImages, 100);
         });
 
         // Setup Environmental restriction check
@@ -578,43 +578,57 @@
         // Auto-load default images (1.png, 2.png, 3.png) from server
         async function loadDefaultImages() {
             try {
+                document.getElementById('bg-file-name').textContent = '載入中...';
+                document.getElementById('male-ref-name').textContent = '載入中...';
+                document.getElementById('female-ref-name').textContent = '載入中...';
+
                 const [bgResp, maleResp, femaleResp] = await Promise.all([
                     fetch('3.png'),
                     fetch('1.png'),
                     fetch('2.png')
                 ]);
-                let loaded = 0;
+
                 if (bgResp.ok) {
-                    const bgBlob = await bgResp.blob();
-                    const reader = new FileReader();
-                    bgImgBase64 = await new Promise(r => { reader.onload = () => r(reader.result); reader.readAsDataURL(bgBlob); });
-                    bgImgBase64 = await compressImage(bgImgBase64);
+                    const blob = await bgResp.blob();
+                    bgImgBase64 = await new Promise(r => {
+                        const reader = new FileReader();
+                        reader.onload = () => r(reader.result);
+                        reader.readAsDataURL(blob);
+                    });
                     document.getElementById('bg-file-name').textContent = '3.png ✓';
                     const thumb = document.getElementById('bg-thumbnail');
                     thumb.src = bgImgBase64;
                     thumb.classList.remove('hidden');
-                    renderComposition();
-                    loaded++;
+                    setTimeout(renderComposition, 50);
                 }
                 if (maleResp.ok) {
-                    const maleBlob = await maleResp.blob();
-                    const reader = new FileReader();
-                    const maleB64 = await new Promise(r => { reader.onload = () => r(reader.result); reader.readAsDataURL(maleBlob); });
-                    maleUniformTemplateBase64 = await compressImage(maleB64);
+                    const blob = await maleResp.blob();
+                    const b64 = await new Promise(r => {
+                        const reader = new FileReader();
+                        reader.onload = () => r(reader.result);
+                        reader.readAsDataURL(blob);
+                    });
+                    maleUniformTemplateBase64 = b64;
                     document.getElementById('male-ref-name').textContent = '1.png ✓';
-                    loaded++;
                 }
                 if (femaleResp.ok) {
-                    const femaleBlob = await femaleResp.blob();
-                    const reader = new FileReader();
-                    const femaleB64 = await new Promise(r => { reader.onload = () => r(reader.result); reader.readAsDataURL(femaleBlob); });
-                    femaleUniformTemplateBase64 = await compressImage(femaleB64);
+                    const blob = await femaleResp.blob();
+                    const b64 = await new Promise(r => {
+                        const reader = new FileReader();
+                        reader.onload = () => r(reader.result);
+                        reader.readAsDataURL(blob);
+                    });
+                    femaleUniformTemplateBase64 = b64;
                     document.getElementById('female-ref-name').textContent = '2.png ✓';
-                    loaded++;
                 }
-                if (loaded === 3) showToast('已自動載入預設圖片 (1.png/2.png/3.png)');
+                if (bgResp.ok && maleResp.ok && femaleResp.ok) {
+                    showToast('已自動載入預設圖片');
+                }
             } catch (e) {
-                console.log('Default images not found, please upload manually');
+                console.error('Auto-load failed:', e);
+                document.getElementById('bg-file-name').textContent = '選擇或拖入背景圖';
+                document.getElementById('male-ref-name').textContent = '男校服';
+                document.getElementById('female-ref-name').textContent = '女校裙';
             }
         }
 
