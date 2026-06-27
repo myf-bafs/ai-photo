@@ -1223,7 +1223,7 @@
 
             try {
                 const canvasDataURL = mainCanvas.toDataURL('image/png');
-                const uploadResp = await fetch('/api/upload', {
+                const uploadResp = await fetch('/api/img', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ image: canvasDataURL })
