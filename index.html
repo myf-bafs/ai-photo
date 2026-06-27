@@ -583,40 +583,36 @@
                     fetch('1.png'),
                     fetch('2.png')
                 ]);
+                let loaded = 0;
                 if (bgResp.ok) {
                     const bgBlob = await bgResp.blob();
-                    bgImgBase64 = await new Promise(r => {
-                        const reader = new FileReader();
-                        reader.onload = () => r(reader.result);
-                        reader.readAsDataURL(bgBlob);
-                    });
+                    const reader = new FileReader();
+                    bgImgBase64 = await new Promise(r => { reader.onload = () => r(reader.result); reader.readAsDataURL(bgBlob); });
                     bgImgBase64 = await compressImage(bgImgBase64);
-                    document.getElementById('bg-file-name').textContent = '3.png (已預載)';
+                    document.getElementById('bg-file-name').textContent = '3.png ✓';
                     const thumb = document.getElementById('bg-thumbnail');
                     thumb.src = bgImgBase64;
                     thumb.classList.remove('hidden');
                     renderComposition();
+                    loaded++;
                 }
                 if (maleResp.ok) {
                     const maleBlob = await maleResp.blob();
-                    const maleB64 = await new Promise(r => {
-                        const reader = new FileReader();
-                        reader.onload = () => r(reader.result);
-                        reader.readAsDataURL(maleBlob);
-                    });
+                    const reader = new FileReader();
+                    const maleB64 = await new Promise(r => { reader.onload = () => r(reader.result); reader.readAsDataURL(maleBlob); });
                     maleUniformTemplateBase64 = await compressImage(maleB64);
-                    document.getElementById('male-ref-name').textContent = '1.png (已預載)';
+                    document.getElementById('male-ref-name').textContent = '1.png ✓';
+                    loaded++;
                 }
                 if (femaleResp.ok) {
                     const femaleBlob = await femaleResp.blob();
-                    const femaleB64 = await new Promise(r => {
-                        const reader = new FileReader();
-                        reader.onload = () => r(reader.result);
-                        reader.readAsDataURL(femaleBlob);
-                    });
+                    const reader = new FileReader();
+                    const femaleB64 = await new Promise(r => { reader.onload = () => r(reader.result); reader.readAsDataURL(femaleBlob); });
                     femaleUniformTemplateBase64 = await compressImage(femaleB64);
-                    document.getElementById('female-ref-name').textContent = '2.png (已預載)';
+                    document.getElementById('female-ref-name').textContent = '2.png ✓';
+                    loaded++;
                 }
+                if (loaded === 3) showToast('已自動載入預設圖片 (1.png/2.png/3.png)');
             } catch (e) {
                 console.log('Default images not found, please upload manually');
             }
