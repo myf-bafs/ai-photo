@@ -559,9 +559,6 @@
 
             // Check protocol and sandbox restrictions on load to display backup helper
             checkEnvironmentSafety();
-
-            // Auto-load default images
-            setTimeout(loadDefaultImages, 100);
         });
 
         // Setup Environmental restriction check
@@ -1782,5 +1779,6 @@
             }, 3000);
         }
     </script>
+    <script>loadDefaultImages();</script>
 </body>
 </html>
