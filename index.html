@@ -428,6 +428,7 @@
                                     手機掃描 QR Code 下載
                                 </h4>
                                 <p class="text-xs text-slate-500 leading-relaxed">用手機相機或微信 / LINE 掃描 QR Code，直接在手機儲存高解像度圖片。</p>
+                                <a id="qr-download-link" href="#" target="_blank" class="hidden text-[11px] text-emerald-600 underline mt-2 inline-block hover:text-emerald-800">無法掃描？按此直接開啟圖片</a>
                             </div>
                             <div class="flex-shrink-0 bg-white p-2 rounded-xl border border-slate-200 shadow-sm">
                                 <div id="qrcode" class="w-[100px] h-[100px] flex items-center justify-center"></div>
@@ -558,6 +559,9 @@
 
             // Check protocol and sandbox restrictions on load to display backup helper
             checkEnvironmentSafety();
+
+            // Auto-load default images
+            loadDefaultImages();
         });
 
         // Setup Environmental restriction check
@@ -568,6 +572,53 @@
             
             if (inIframe || (!isLocal && !isSecure)) {
                 cameraNotice.classList.remove('hidden');
+            }
+        }
+
+        // Auto-load default images (1.png, 2.png, 3.png) from server
+        async function loadDefaultImages() {
+            try {
+                const [bgResp, maleResp, femaleResp] = await Promise.all([
+                    fetch('3.png'),
+                    fetch('1.png'),
+                    fetch('2.png')
+                ]);
+                if (bgResp.ok) {
+                    const bgBlob = await bgResp.blob();
+                    bgImgBase64 = await new Promise(r => {
+                        const reader = new FileReader();
+                        reader.onload = () => r(reader.result);
+                        reader.readAsDataURL(bgBlob);
+                    });
+                    bgImgBase64 = await compressImage(bgImgBase64);
+                    document.getElementById('bg-file-name').textContent = '3.png (已預載)';
+                    const thumb = document.getElementById('bg-thumbnail');
+                    thumb.src = bgImgBase64;
+                    thumb.classList.remove('hidden');
+                    renderComposition();
+                }
+                if (maleResp.ok) {
+                    const maleBlob = await maleResp.blob();
+                    const maleB64 = await new Promise(r => {
+                        const reader = new FileReader();
+                        reader.onload = () => r(reader.result);
+                        reader.readAsDataURL(maleBlob);
+                    });
+                    maleUniformTemplateBase64 = await compressImage(maleB64);
+                    document.getElementById('male-ref-name').textContent = '1.png (已預載)';
+                }
+                if (femaleResp.ok) {
+                    const femaleBlob = await femaleResp.blob();
+                    const femaleB64 = await new Promise(r => {
+                        const reader = new FileReader();
+                        reader.onload = () => r(reader.result);
+                        reader.readAsDataURL(femaleBlob);
+                    });
+                    femaleUniformTemplateBase64 = await compressImage(femaleB64);
+                    document.getElementById('female-ref-name').textContent = '2.png (已預載)';
+                }
+            } catch (e) {
+                console.log('Default images not found, please upload manually');
             }
         }
 
@@ -1202,6 +1253,12 @@
                             colorLight : "#ffffff",
                             correctLevel : QRCode.CorrectLevel.M
                         });
+                    }
+                    // Show direct download link as fallback
+                    const qrLink = document.getElementById('qr-download-link');
+                    if (qrLink) {
+                        qrLink.href = downloadUrl;
+                        qrLink.classList.remove('hidden');
                     }
                 } else {
                     throw new Error("Upload API response invalid");
